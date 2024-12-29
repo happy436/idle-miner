@@ -45,15 +45,16 @@ function App() {
 	const SellItem = (name, value) => {
 		//найденный елемент
 		const findedItem = loot.find((item) => item.name === name);
+
 		//вырученные деньги с продажи
 		const proceeds = findedItem.price * value;
 		//уменьшение количества предмета
-		const newCount = findedItem.count - value;
+		const newCount = findedItem.amount - value;
 		//обновление данных
 		setLoot((prev) => {
 			return prev.map((item) => {
 				if (item.name === name) {
-					return { ...item, count: newCount };
+					return { ...item, amount: newCount };
 				}
 				return item;
 			});

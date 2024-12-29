@@ -49,7 +49,7 @@ const LootContent = ({
 										value={choosedValueOnLoot}
 										onChange={handleChangeValue}
 										max={item.amount}
-										onSell={handleSell}
+										onSell={() => handleSell(item.name,choosedValueOnLoot)}
 									/>
 								</div>
 							</li>
