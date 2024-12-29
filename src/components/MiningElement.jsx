@@ -15,10 +15,12 @@ const MiningElement = ({
 	onUpgradeMenu,
 	onLoad,
 	onUpload,
+	data,
+	onMining,
 }) => {
 	const containerRef = useRef(null);
 	const [distance, setDistance] = useState(0);
-	const [progress, setProgress] = useState(0);
+	const [progress, setProgress] = useState(1);
 	const [direction, setDirection] = useState(0);
 	const CargoSpeed = upgradesData
 		.find((item) => item.name === mining.name)
@@ -30,6 +32,21 @@ const MiningElement = ({
 			setDistance((width - 60) * (progress / 100));
 		}
 	}, [progress]);
+
+	useEffect(() => {
+		const time =
+			upgradesData
+				.find((item) => item.name === mining.name)
+				.upgrades.find((item) => item.name === "Mining Rate").value *
+			1000;
+		const miningProcess = setInterval(() => {
+			onMining(mining.name);
+		}, time);
+
+		return () => {
+			clearInterval(miningProcess);
+		};
+	}, [mining]);
 
 	useEffect(() => {
 		let animationFrameId;
@@ -62,11 +79,11 @@ const MiningElement = ({
 		}
 	}, [direction]);
 
-    useEffect(() => {
-        if(mining.purchased){
-            setDirection(1)
-        }
-    },[mining.purchased])
+	useEffect(() => {
+		if (mining.purchased) {
+			setDirection(1);
+		}
+	}, [mining.purchased]);
 
 	return (
 		<div
@@ -103,8 +120,8 @@ const MiningElement = ({
 						/>
 					</div>
 					<div className="flex flex-col items-center">
-						<OreIcon miningData={mining} />
-						<div>{mining.amount}</div>
+						<OreIcon data={data} />
+						<div>{mining.amount.toFixed(2)}</div>
 					</div>
 				</>
 			)}
@@ -126,6 +143,12 @@ const mineShape = PropTypes.shape({
 });
 
 MiningElement.propTypes = {
+    onMining: PropTypes.func.isRequired,
+    data: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        price: PropTypes.number.isRequired,
+        amount: PropTypes.number.isRequired,
+        }).isRequired,
 	mining: PropTypes.shape({
 		name: PropTypes.string.isRequired,
 		purchased: PropTypes.bool.isRequired,
@@ -136,7 +159,7 @@ MiningElement.propTypes = {
 	onUpgradeMenu: PropTypes.func.isRequired,
 	onLoad: PropTypes.func.isRequired,
 	onUpload: PropTypes.func.isRequired,
-	upgradesData: PropTypes.arrayOf(mineShape).isRequired, 
+	upgradesData: PropTypes.arrayOf(mineShape).isRequired,
 };
 
 export default MiningElement;

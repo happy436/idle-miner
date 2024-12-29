@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-const MiningUpgrades = ({ mining, name }) => {
+const MiningUpgrades = ({ mining, name, onUpgrade }) => {
 	const miningData = mining.find((item) => item.name === name).upgrades;
 	return (
 		<div className="">
@@ -13,7 +13,7 @@ const MiningUpgrades = ({ mining, name }) => {
 						<p>{item.name}</p>
 						<p>{item.level}</p>
 						<button
-							onClick={() => {}}
+							onClick={() => {onUpgrade(name, item.name)}}
 							className="text-white bg-yellow-400 px-5 py-3 rounded-3xl"
 						>
 							{item.price}$

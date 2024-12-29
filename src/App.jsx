@@ -26,20 +26,55 @@ function App() {
 			active: !prev.active,
 		}));
 	};
-	const [money, setMoney] = useState(0);
+	const [money, setMoney] = useState(1000);
 	const [mines, setMines] = useState(minesData);
 	const [minesUpgrade, setMinesUpgrade] = useState(minesUpgradesData);
 	const [loot, setLoot] = useState(lootData);
 	const [choosedValueOnLoot, setChoosedValueOnLoot] = useState(0);
 	const [activeLootPage, setActiveLootPage] = useState("Ores");
+    const [activeLootItemForSell, setActiveLootItemForSell] = useState(null);
 
 	const handleChangeValueOnProgressLoot = (e) => {
 		setChoosedValueOnLoot(Number(e.target.value));
 	};
 
+    const handleChooseItemForSell = (name) => {
+        setActiveLootItemForSell(name);
+    }
+
 	const handleActiveLootPage = (name) => {
 		setActiveLootPage(name);
 	};
+
+    const handleUpgradeMining = (name, nameUpgrade) => {
+        const miningUpgradeData = minesUpgrade
+            .find((item) => item.name === name)
+            ?.upgrades.find((upgrade) => upgrade.name === nameUpgrade);
+        const price = miningUpgradeData.price;
+        const value = miningUpgradeData.value;
+        const coef = miningUpgradeData.coef;
+        const newLevel = miningUpgradeData.level + 1;
+        const newPrice = miningUpgradeData.price * 2;
+        const newValue = value * coef
+        const newUpgrade = { ...miningUpgradeData, level: newLevel, price: newPrice, value: newValue };
+
+        if (money >= price) {
+            setMinesUpgrade((prev) => {
+                return prev.map((item) => {
+                    if (item.name === name) {
+                        return {
+                            ...item,
+                            upgrades: item.upgrades.map((upgrade) =>
+                                upgrade.name === nameUpgrade ? newUpgrade : upgrade
+                            ),
+                        };
+                    }
+                    return item;
+                });
+            });
+            setMoney((prev) => prev - price);
+        }
+    }
 
 	// фукнция продажи
 	const SellItem = (name, value) => {
@@ -49,6 +84,7 @@ function App() {
 		//вырученные деньги с продажи
 		const proceeds = findedItem.price * value;
 		//уменьшение количества предмета
+        if(findedItem.amount < value) return;
 		const newCount = findedItem.amount - value;
 		//обновление данных
 		setLoot((prev) => {
@@ -168,6 +204,7 @@ function App() {
 					<MiningUpgrades
 						mining={minesUpgrade}
 						name={DropDownMenuState.minesName}
+                        onUpgrade={handleUpgradeMining}
 					/>
 				);
 			case "Loot":
@@ -180,6 +217,8 @@ function App() {
 						handleChangeValue={handleChangeValueOnProgressLoot}
 						choosedValueOnLoot={choosedValueOnLoot}
 						handleSell={SellItem}
+                        handleChooseItemForSell={handleChooseItemForSell}
+                        activeLootItemForSell={activeLootItemForSell}
 					/>
 				);
 			default:
@@ -200,11 +239,13 @@ function App() {
 						<li key={item.name}>
 							<MiningElement
 								mining={item}
+                                data={loot.find((ore) => ore.name === item.name)}
 								onPurchase={handlePurchase}
 								onUpgradeMenu={handleActiveDropDownMenu}
 								upgradesData={minesUpgrade}
 								onLoad={LoadingCart}
 								onUpload={UploadingCart}
+                                onMining={Mining}
 							/>
 						</li>
 					))}

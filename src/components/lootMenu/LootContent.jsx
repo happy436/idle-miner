@@ -10,7 +10,9 @@ const LootContent = ({
 	miningData,
 	handleChangeValue,
 	choosedValueOnLoot,
-    handleSell
+	handleSell,
+	handleChooseItemForSell,
+	activeLootItemForSell,
 }) => {
 	const lootPages = ["Ores", "Alloys", "Items"];
 	const renderItems = (name) => {
@@ -34,22 +36,34 @@ const LootContent = ({
 					if (Object.prototype.hasOwnProperty.call(item, "amount")) {
 						return (
 							<li key={item.name}>
-								<div className="grid grid-cols-4 gap-4 items-center justify-items-center">
-									<OreIcon
-										miningData={miningData.find(
-											(data) => data.name === item.name
-										)}
-									/>
+								<div
+									className="grid grid-cols-4 gap-4 items-center justify-items-center"
+									onClick={() =>
+										handleChooseItemForSell(item.name)
+									}
+								>
+									<OreIcon data={item} />
 									<p>{item.name}</p>
-									<p>{item.amount}</p>
+									<p>{item.amount.toFixed(2)}</p>
 									<p>{item.price}$</p>
 								</div>
-								<div>
+								<div
+									className={`${
+										item.name === activeLootItemForSell
+											? "block"
+											: "hidden"
+									}`}
+								>
 									<ProgressBar
 										value={choosedValueOnLoot}
 										onChange={handleChangeValue}
 										max={item.amount}
-										onSell={() => handleSell(item.name,choosedValueOnLoot)}
+										onSell={() =>
+											handleSell(
+												item.name,
+												choosedValueOnLoot
+											)
+										}
 									/>
 								</div>
 							</li>
@@ -83,7 +97,7 @@ const LootContent = ({
 };
 
 LootContent.propTypes = {
-    handleSell: PropTypes.func.isRequired,
+	handleSell: PropTypes.func.isRequired,
 	activeLootPage: PropTypes.string.isRequired,
 	onActiveLootPage: PropTypes.func.isRequired,
 	miningData: PropTypes.arrayOf(PropTypes.object).isRequired,

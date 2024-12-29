@@ -12,7 +12,7 @@ const ProgressBar = ({ value, onChange, max, onSell }) => {
 				onChange={onChange}
 				
 			/>
-			<p>{value}</p>
+			<p>{value.toFixed(0)}</p>
             <button className="bg-yellow-400 rounded-3xl px-3 py-2" onClick={() => {onSell()}}>Sell</button>
 		</div>
 	);
